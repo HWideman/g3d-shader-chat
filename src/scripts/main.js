@@ -2,10 +2,14 @@ import * as THREE from 'three';
 
 // import CameraControls from 'camera-controls';
 import canvasRecord from "canvas-record";
-import fragmentShader from '../shader/fragment.glsl';
+import fragmentShader from '../shader/thing.glsl';
 import vertexShader from '../shader/vertex.glsl';
 
 const clock = new THREE.Clock();
+
+window.onclick = () => {
+    clock.running ? clock.stop() : clock.start();
+};
 
 let camera, scene, renderer;
 let material, geometry, plane;
@@ -21,8 +25,6 @@ const getHeight = () => {
     return window.innerHeight;
 };
 
-// let width = window.innerWidth >= window.innerHeight ? window.innerHeight : window.innerWidth;
-// let height = width;
 let width = getWidth();
 let height = getHeight();
 
@@ -78,7 +80,7 @@ const record = async () => {
         }
     });
     canvasRecorder.start();
-    await sleep(10000);
+    await sleep(5000);
     canvasRecorder.stop();
     canvasRecorder.dispose();
 };
