@@ -43,17 +43,6 @@ vec3 getNormal(vec3 p) {
     return normalize(n);
 }
 
-// via https://www.iquilezles.org/
-// vec3 getNormal( vec3 p) {
-//     vec2 h = vec2(EPSILON, 0);
-//     return normalize(vec3(
-//         sdf(p + h.xyy) - sdf(p - h.xyy),
-//         sdf(p + h.yxy) - sdf(p - h.yxy),
-//         sdf(p + h.yyx) - sdf(p - h.yyx)
-//     ));
-// }
-
-// src - https://www.shadertoy.com/view/4tByzD
 float rayMarch(vec3 origin, vec3 direction) {
     // used to store current and last distance
     vec2 dist = vec2(MIN_DIST);
@@ -108,13 +97,11 @@ void main(void) {
     vec3 color = vec3(0., 0., 0.);
     if (hitDist < MAX_DIST) {
         vec3 p = cam + direction * hitDist;
-        // color = vec3(1.);
-        // vec3 normal = getNormal(p);
-        // color = normal;
+        vec3 normal = getNormal(p);
+        color = normal;
         
-        float diffuse = getLight(light, p);
-        color = vec3(diffuse * 0.85);
-         
+        // float diffuse = getLight(light, p);
+        // color = vec3(diffuse * 0.85);
     }
 
     gl_FragColor = vec4(color, 1.);

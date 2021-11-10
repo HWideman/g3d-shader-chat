@@ -1,8 +1,11 @@
 import * as THREE from 'three';
 
-// import CameraControls from 'camera-controls';
 import canvasRecord from "canvas-record";
-import fragmentShader from '../shader/thing.glsl';
+import fragmentShader from '../shader/sphere.glsl';
+// import fragmentShader from '../shader/cylinder.glsl';
+// import fragmentShader from '../shader/ball_slice.glsl';
+// import fragmentShader from '../shader/ball_slice_perpetual.glsl';
+// import fragmentShader from '../shader/concrete.glsl';
 import vertexShader from '../shader/vertex.glsl';
 
 const clock = new THREE.Clock();
@@ -17,7 +20,6 @@ let material, geometry, plane;
 const RECORDING = false;
 
 const getWidth = () => {
-    // return window.innerWidth >= window.innerHeight ? window.innerHeight : window.innerWidth;
     return window.innerWidth;
 };
 
@@ -32,8 +34,6 @@ const uniforms = {
     time: { value : 0},
     resolution: { value: new THREE.Vector2(width, height) },
 };
-
-console.log(uniforms);
 
 const render = () => {
     renderer.render( scene, camera );
@@ -60,7 +60,6 @@ const init = () => {
     setupRenderer();
     addObjects();
     document.body.appendChild( renderer.domElement );
-    // cameraControls = new CameraControls( camera, renderer.domElement );
     render();
     anim();
 
@@ -85,18 +84,9 @@ const record = async () => {
     canvasRecorder.dispose();
 };
 
-// CameraControls.install( { THREE: THREE } );
-
 const anim = () => {
-	// const delta = clock.getDelta();
-	// const hasControlsUpdated = cameraControls.update( delta );
-
 	requestAnimationFrame( anim );
-
-	// // you can skip this condition to render though
-	// if ( hasControlsUpdated ) {
-		render();
-	// }
+    render();
 };
 
 const setupCamera = () => {

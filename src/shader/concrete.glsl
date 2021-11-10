@@ -179,17 +179,6 @@ vec3 getNormal(vec3 p) {
     return normalize(n);
 }
 
-// via https://www.iquilezles.org/
-// vec3 getNormal( vec3 p) {
-//     vec2 h = vec2(EPSILON, 0);
-//     return normalize(vec3(
-//         sdf(p + h.xyy) - sdf(p - h.xyy),
-//         sdf(p + h.yxy) - sdf(p - h.yxy),
-//         sdf(p + h.yyx) - sdf(p - h.yyx)
-//     ));
-// }
-
-// src - https://www.shadertoy.com/view/4tByzD
 float rayMarch(vec3 origin, vec3 direction) {
     // used to store current and last distance
     vec2 dist = vec2(MIN_DIST);
@@ -246,7 +235,7 @@ void main(void) {
     // uv.x += time*0.1;
 
     // rayMarch scene
-    vec3 cam = vec3(time*0.4, 0., 9.); // static
+    vec3 cam = vec3(time*0.4, 0., 1.); // static
     // vec3 cam = vec3(vec2(time), 0); // move towards top right
     // vec3 cam = vec3(time*0.4, 0., 10.); // move right
     // vec3 cam = vec3(0., 0., -time*3.); // move forwards

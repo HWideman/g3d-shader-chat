@@ -13,15 +13,19 @@ vec2 add = vec2(1.0, 0.0);
 // EPSILON ϵ - usually used to denote a small quantity
 float EPSILON = 0.0001;
 
-float sdfSphere (vec3 p, float r){
-    // return distance(mod(p, 10.), vec3(5.))-r;
+float sdfSphere (vec3 p, float r) {
+    // return distance(mod(p, 3.), vec3(1.5))-r;
 
     return distance(p, vec3(0.))-r;
 }
 
+float sdfPlane (vec3 p) {
+    return p.y + .25;
+}
+
 float sdf(vec3 p) {
-    // p = p + 1. * vec3(0,-0.5*time,time);
-    return sdfSphere(p, .2);
+    // return sdfSphere(p, .2);
+    return min(sdfSphere(p, .2), sdfPlane(p));
 }
 
 // via the art of code
@@ -38,17 +42,31 @@ vec3 getNormal(vec3 p) {
     return normalize(n);
 }
 
-// via https://www.iquilezles.org/
-// vec3 getNormal( vec3 p) {
-//     vec2 h = vec2(EPSILON, 0);
-//     return normalize(vec3(
-//         sdf(p + h.xyy) - sdf(p - h.xyy),
-//         sdf(p + h.yxy) - sdf(p - h.yxy),
-//         sdf(p + h.yyx) - sdf(p - h.yyx)
-//     ));
-// }
+// via iquelezles
+// https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm
+// https://www.shadertoy.com/view/lsKcDD
+float calcSoftshadow( in vec3 ro, in vec3 rd, in float mint, in float tmax )
+{
+	float res = 1.0;
+    float t = mint;
+    float ph = 1e10; // big, such that y = 0 on the first iteration
+    
+    for( int i=0; i<32; i++ ) {
+		float h = sdf( ro + rd*t );
+        float y = h*h/(2.0*ph);
+        float d = sqrt(h*h-y*y);
+        res = min( res, 10.0*d/max(0.0,t-y) );
+        ph = h;
+        
+        t += h;
+        
+        if( res<0.0001 || t>tmax ) break;
+    }
 
-// src - https://www.shadertoy.com/view/4tByzD
+    res = clamp( res, 0.0, 1.0 );
+    return res*res*(3.0-2.0*res);
+}
+
 float rayMarch(vec3 origin, vec3 direction) {
     // used to store current and last distance
     vec2 dist = vec2(MIN_DIST);
@@ -94,21 +112,23 @@ void main(void) {
     vec2 uv = (gl_FragCoord.xy - 0.5*resolution.xy) / resolution.y;
 
     // rayMarch scene
-    vec3 cam = vec3(0., 0., .75);
-    // vec3 cam = vec3(vec2(time*0.75), 0);
-    vec3 light = vec3(cam.x + 10., cam.y + 10., 3.);
+    vec3 cam = vec3(0., 0., 1.5);
+    // vec3 cam = vec3(0., 0., time);
+    vec3 light = vec3(1., sin(time) + 1., 0.);
     vec3 direction = normalize(vec3(uv, -1));
     float hitDist = rayMarch(cam, direction);
 
     vec3 color = vec3(0., 0., 0.);
     if (hitDist < MAX_DIST) {
         vec3 p = cam + direction * hitDist;
-        // color = vec3(1.);
         vec3 normal = getNormal(p);
-        
-        // float diffuse = getLight(light, p);
-        // color = vec3(diffuse * 0.85);
         color = normal;
+        
+        float diffuse = getLight(light, p);
+        color = vec3(diffuse*.85);
+
+        float shadow = calcSoftshadow(p, light, 0.001, 1.);
+        color *= shadow;
     }
 
     gl_FragColor = vec4(color, 1.);
