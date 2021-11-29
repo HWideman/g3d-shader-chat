@@ -81,7 +81,7 @@
     "prng": "0.0.1",
     "raw-loader": "^4.0.2",
     "seed-random": "^2.2.0",
-    "three": "^0.131.3",
+    "three": "^0.135.0",
     "threecap": "^0.2.1",
     "tweenjs": "^1.0.2",
     "uuid": "^8.3.2",
